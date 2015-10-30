@@ -24,11 +24,15 @@ int crc_x (int data, int data_length, int crc_length){
   // int data; // user defined data field
   int telem; // telem field, includes user defined data and x-bit crc
   //MODIFIY FOLLOWING CODE BEFORE POSTING TO FORUMS
-  int const poly = 19; // 5-bit polynomial that is used to create the 4-bit crc
+  int poly = 19; // 5-bit polynomial that is used to create the 4-bit crc
   // the value 0d19 is equivalent to the standard crc representations of 0x3 (normal), 0xC (reversed) or
   //  0x9 (koonman); all are equal to the polynomail of x^4 + x^1 + 1 or 0b10011: https://en.wikipedia.org/wiki/Cyclic_redundancy_check
-  int crc_polys[]; // declare the array that holds all the crc polynomials
-                 //  index number correspondends to bit size
+  int crc_polys[] = {-1, -1, -1, 0x5, 0x9, 0x12, 0x33, 0x65, 0xE7, 0x119, 0x327, 0x5DB, 0x987, 0x1ABF, 0x27CF, 0x4F23,
+                0x8D95, 0x16FA7, 0x23979, 0x6FB57, 0xB5827, 0x1707EA, 0x308FD3, 0x540FD0, 0x8F90E3, 0x101690C, 
+                0x33C19EF, 0x5E04635, 0x91DC1E3}; // declare the array that holds crc polynomials of bit size 3-28
+                 // index number correspondends to bit size, "-1" in the first three cells are invalid selections.
+                 //  if a "-1" is selected, the code defaults to index 3 or 0x5
+  poly = (crc_polys[crc_length]<<1) + 1; // shift poly and add one to place it into a format usable by Arduino
   //END MODIFY SECTION
   // int crc_length; // bit length of the crc tail
   int const poly_length = crc_length+1; // length of the crc polynomial
