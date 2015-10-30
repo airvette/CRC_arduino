@@ -7,7 +7,6 @@ int telem_test;
 // for this test case the answer should be 0b1101001110110110,
 //  0d54198
 
-
 void setup() {
   // put your setup code here, to run once:
   telem_test = crc_x(data_test, data_length_test, crc_length_test);  
@@ -32,16 +31,18 @@ int crc_x (int data, int data_length, int crc_length){
                 0x33C19EF, 0x5E04635, 0x91DC1E3}; // declare the array that holds crc polynomials of bit size 3-28
                  // index number correspondends to bit size, "-1" in the first three cells are invalid selections.
                  //  if a "-1" is selected, the code defaults to index 3 or 0x5
+                 // these polynomials are recommended by P. Koopman of Carnegie Mellon Univ
+                 // https://users.ece.cmu.edu/~koopman/crc/#notation
   poly = (crc_polys[crc_length]<<1) + 1; // shift poly and add one to place it into a format usable by Arduino
   //END MODIFY SECTION
-  // int crc_length; // bit length of the crc tail
   int const poly_length = crc_length+1; // length of the crc polynomial
   int const telem_length = data_length + crc_length; // length of the telem field
 
   int tmp_telem = data << crc_length; // 16-bit working telem field, used to calculate the telem
   int tmp_quot; // 5-bit quotient for the intermediate steps in calculating the CRC
-  // for loop starting with the MSB and working towards the LSB.  For a 16-bit telem and a 5-bit poly, the index goes from 15 (MSB) to 4 (LSB+5)
-
+  
+  // for loop starting with the MSB and working towards the LSB.  For a 16-bit telem and a 5-bit poly, 
+  //  the index goes from 15 (MSB) to 4 (LSB+5)
   for (int i = telem_length-poly_length; i >= 0; i--){
     if (bitRead(tmp_telem, (i+poly_length-1)) == 1) // if the MSB of the selected telem subset is a 1
     {
