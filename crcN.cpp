@@ -45,7 +45,7 @@ int crcN (int data, int data_length, int crc_length)
 
   // shift poly and add one to place it into a format usable by Arduino
   // see https://en.wikipedia.org/wiki/Cyclic_redundancy_check for more info
-  poly = (crc_polys[crc_length] << 1) + 1;
+  int poly = (crc_polys[crc_length] << 1) + 1;
 
   int const poly_length = crc_length + 1; // length of the crc polynomial
   int const pkt_length = data_length + crc_length; // length of the pkt field
