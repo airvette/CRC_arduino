@@ -16,8 +16,15 @@
  *   the last actions before transmitting a digital packet, so packet was the
  *   chosen name.  The packet is made up of the input data and the crc, which is
  *   added as a suffix
+ * Note on memory: There are two different functions below.  The standard
+ *   function (crcN) uses the standard memory size of an integer (16 bits),
+ *   whereas crcNl utilizes the long format for data types and crc checksums
+ *   longer than 16 bits.  This extra capability function can handle a data input
+ *   up to 32 bits and a crc as large as 28 bits with the draw back of utilizing
+ *   much more memory
  */
 
  #include "Arduino.h"
 
- int crcN (int data, int data_length, int crc_length);
+ unsigned int crcN (unsigned int data, int data_length, int crc_length);
+ unsigned long crcNl (unsigned long data, int data_length, int crc_length);
