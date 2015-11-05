@@ -4,7 +4,7 @@
 
 #include <crcN.h>
 
-int crc_test;
+unsigned int crc_test;
 /*
 int data_test = 3387; // 0b110100111011, 0xD3B
 int data_length_test = 12;
@@ -13,7 +13,7 @@ int crc_length_test = 4;
 //  0d54198
 */
 
-int data_16_test[] = {0x6EF1, 0xB59E, 0x25CD, 0x69F};
+unsigned int data_16_test[] = {0x6E1F, 0xB59E, 0x25CD, 0x69F};
 int data_length_test[] = {16, 16, 16, 12};
 
 /*
@@ -41,7 +41,7 @@ void setup() {
   // Multiple case test script
   for(int crc_length_test = 3; crc_length_test<=16; crc_length_test++){
     for (int j = 0; j<=3; j++){
-      crc_test = crcN(data_16_test[j], data_length_test[j], crc_length_test);
+      crc_test = crcN(data_16_test[j], crc_length_test);
       Serial.print("The crc length is ");
       Serial.println(crc_length_test);
       Serial.print("The data is ");
