@@ -1,6 +1,10 @@
 /* crcN.h
  * A simple library containing code to calculate the cyclic redundancy check (crc)
  * as a checksum for communication between an Arduino and another device.
+ * To make the most use of the overloaded functionality, the recommended format
+ * of the function call is:
+ * int crc_output = crcN(data, sizeof(data)/2, crc_length);
+ * Where "data" can be a single 16-bit integer or an array of 16-bit integers.
  *
  * Note on memory: There are two different functions below.  The standard
  *   function (crcN) uses the standard memory size of an integer (16 bits),
@@ -13,10 +17,14 @@
 #include "Arduino.h"
 #include "crcN.h"
 
-/* crcN (Cyclic Redundancy Check, standard format)
+/* crcN (Cyclic Redundancy Check, non-array format)
  * This function uses three variables as the input:
  * - data: This is the data for which the user desires a crc. The standard data
  *   type length is 16 bits
+ * - dataSize: This is the size of the data value in number of integers (16-
+ *   bits each).  For this version of crcN() the value of this variable is
+ *   not relevant because it is not used for the algorithm.  It is included in
+ *   this version so that the format remains the same for both types of crcN().
  * - crc_length: The desired length of the crc checksum.  Acceptable values are
  *   3-15.  If the value entered is less than 3, crc_length is set to three and
  *   if the number is greater than 15, the length is set to 15, which is the max
@@ -28,7 +36,7 @@
  *   the crc and any other relevant info.
  */
 
-unsigned int crcN (unsigned int data, int crc_length)
+unsigned int crcN (unsigned int data, int dataSize, int crc_length)
 {
   unsigned int crc; // crc field, this is the output of this function
   int const memSize = 16; // constant defining the interger memory size (16 bits)
@@ -79,7 +87,7 @@ unsigned int crcN (unsigned int data, int crc_length)
   return crc = tmp_crc; // return the answer
 } // end crcN
 
-/* crcN (Cyclic Redundancy Check, standard format)
+/* crcN (Cyclic Redundancy Check, array format)
  * This function uses three variables as the input:
  * - data[]: This is the data for which the user desires a crc. The expected
  *   input is a data field divided up into a series of integers formatted with
@@ -87,6 +95,11 @@ unsigned int crcN (unsigned int data, int crc_length)
  *   The integers become less significant as the array index increases.
  *   For example, the data field of value E100CAFE should be formatted as
  *   data = {E100, CAFE} before this function is called
+ * - dataSize: This is the size of the data value in number of integers (16-
+ *   bits each).  For this version of crcN() the value of this variable should
+ *   be some value greater than 1 and limited by the Arduino's memory. It is
+ *   recommended that the Arduino function sizeof() be used as the input to this
+ *   variable.
  * - crc_length: The desired length of the crc checksum.  Acceptable values are
  *   3-15.  If the value entered is less than 3, crc_length is set to three and
  *   if the number is greater than 15, the length is set to 15, which is the max
@@ -98,12 +111,10 @@ unsigned int crcN (unsigned int data, int crc_length)
  *   the crc and any other relevant info.
  */
 
-unsigned int crcN (unsigned int data[], int crc_length)
+unsigned int crcN (unsigned int data[], int dataSize, int crc_length)
 {
   unsigned int crc; // crc field, this is the output of this function
   int const memSize = 16; // constant defining the interger memory size (16 bits)
-  int const dataSize = sizeof data; // get the size of the input in ints
-  //~int const dataSize = ceil(sizeof(data)/2); // get the size of the input in ints
   Serial.println(dataSize);
   unsigned int crc_polys[] = {-1, -1, -1, 0x5, 0x9, 0x12, 0x33, 0x65, 0xE7, 0x119, 0x327,
       0x5DB, 0x987, 0x1ABF, 0x27CF, 0x4F23};
@@ -149,6 +160,11 @@ unsigned int crcN (unsigned int data[], int crc_length)
       if (bitRead(tmp_crc, poly_length-1)){ // if the MSB of the working CRC val is 1
         tmp_crc = tmp_crc ^ poly; // execute the XOR calculation with the poly var
       } // end if
+
+      //DEBUG CODE START
+      Serial.print("Iteration's tmp_crc value: ");
+      Serial.println(tmp_crc, BIN);
+      //DEBUG CODE END
 
       // Regardless if the MSB is a 0 or 1 and the XOR calc was executed, tmp_crc
       //  needs to be prepped for the next FOR iteration if there is one

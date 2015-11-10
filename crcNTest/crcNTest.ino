@@ -14,7 +14,8 @@ int crc_length_test = 4;
 */
 
 unsigned int data_16_test[] = {0x6E1F, 0xB59E, 0x25CD, 0x69F};
-unsigned int data_long_test[] = {0xE1, 0xF3, 0xCA, 0xFE, 0x53, 0xA2};
+unsigned int data_long_test[] = {0xE1, 0xF3};
+unsigned int crc_long_test = 3;
 
 /*
 int data_32_test[] = {0b10000110110101110110111000011111, //2262265375, 0x86D76E1F
@@ -41,7 +42,7 @@ void setup() {
   // Multiple case test script
   for(int crc_length_test = 3; crc_length_test<=5; crc_length_test++){
     for (int j = 0; j<=3; j++){
-      crc_test = crcN(data_16_test[j], crc_length_test);
+      crc_test = crcN(data_16_test[j], 1, crc_length_test);
       Serial.print("The crc length is ");
       Serial.println(crc_length_test);
       Serial.print("The data is ");
@@ -53,13 +54,12 @@ void setup() {
   } // end for
 
   // Long format test
-  crc_test = crcN(data_long_test, 5);
+  crc_test = crcN(data_long_test, sizeof(data_long_test)/2, crc_long_test);
   Serial.print("The crc length is ");
-  Serial.println(5);
+  Serial.println(3);
   Serial.print("The data is ");
   Serial.print(data_long_test[0], HEX);
   Serial.print(data_long_test[1], HEX);
-  Serial.println(data_long_test[2], HEX);
   Serial.print("The compiled packet is ");
   Serial.println(crc_test, BIN);
   Serial.println();
