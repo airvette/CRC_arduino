@@ -26,4 +26,5 @@
  #include "Arduino.h"
 
  unsigned int crcN (unsigned int data, int crc_length);
+ unsigned int crcN (unsigned int data[], int crc_length);
  //unsigned long crcNl (unsigned long data, int data_length, int crc_length);
