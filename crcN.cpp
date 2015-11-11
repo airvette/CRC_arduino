@@ -1,6 +1,7 @@
 /* crcN.h
  * A simple library containing code to calculate the cyclic redundancy check (crc)
  * as a checksum for communication between an Arduino and another device.
+ *
  * To make the most use of the overloaded functionality, the recommended format
  * of the function call is:
  * int crc_output = crcN(data, sizeof(data)/2, crc_length);
@@ -8,10 +9,8 @@
  *
  * Note on memory: There are two different functions below.  The standard
  *   function (crcN) uses the standard memory size of an integer (16 bits),
- *   whereas crcNl utilizes the long format for data types and crc checksums
- *   longer than 16 bits.  This extra capability function can handle a data input
- *   up to 32 bits and a crc as large as 28 bits with the draw back of utilizing
- *   much more memory
+ *   whereas crcN utilizes the an array format for data types
+ *   longer than 16 bits.
  */
 
 #include "Arduino.h"
@@ -30,10 +29,11 @@
  *   if the number is greater than 15, the length is set to 15, which is the max
  *   crc length for that can support a two-byte integer data type
  * One varible is returned:
- * - cksum: Short for checksum.  It assumed that calculating the CRC will be one of
- *   the last actions before transmitting a digital packet.  The user is
- *   responsible for assembling the packet which is made up of the input data,
- *   the crc and any other relevant info.
+ * - crc: Short for Cyclic Reduncancy Check, a type of checksum.  It assumed
+ *   that calculating the CRC will be one of the last actions before
+ *   transmitting a digital packet.  The user is responsible for assembling the
+ *   packet which should be made up of the input data, the crc and any other
+ *   relevant info.
  */
 
 unsigned int crcN (unsigned int data, int dataSize, int crc_length)
@@ -98,24 +98,25 @@ unsigned int crcN (unsigned int data, int dataSize, int crc_length)
  * - dataSize: This is the size of the data value in number of integers (16-
  *   bits each).  For this version of crcN() the value of this variable should
  *   be some value greater than 1 and limited by the Arduino's memory. It is
- *   recommended that the Arduino function sizeof() be used as the input to this
+ *   recommended that the statement sizeof(data)/2 be used as the input to this
  *   variable.
  * - crc_length: The desired length of the crc checksum.  Acceptable values are
  *   3-15.  If the value entered is less than 3, crc_length is set to three and
  *   if the number is greater than 15, the length is set to 15, which is the max
- *   crc length for that can support a two-byte integer data type
+ *   crc length for that can support a two-byte integer data type without
+ *   utilizing additional memory
  * One varible is returned:
- * - cksum: Short for checksum.  It assumed that calculating the CRC will be one of
- *   the last actions before transmitting a digital packet.  The user is
- *   responsible for assembling the packet which is made up of the input data,
- *   the crc and any other relevant info.
+ * - crc: Short for Cyclic Reduncancy Check, a type of checksum.  It assumed
+ *   that calculating the CRC will be one of the last actions before
+ *   transmitting a digital packet.  The user is responsible for assembling the
+ *   packet which should be made up of the input data, the crc and any other
+ *   relevant info.
  */
 
 unsigned int crcN (unsigned int data[], int dataSize, int crc_length)
 {
   unsigned int crc; // crc field, this is the output of this function
   int const memSize = 16; // constant defining the interger memory size (16 bits)
-  Serial.println(dataSize);
   unsigned int crc_polys[] = {-1, -1, -1, 0x5, 0x9, 0x12, 0x33, 0x65, 0xE7, 0x119, 0x327,
       0x5DB, 0x987, 0x1ABF, 0x27CF, 0x4F23};
       /* declare the array that holds crc polynomials of bit size 3-15
@@ -161,22 +162,18 @@ unsigned int crcN (unsigned int data[], int dataSize, int crc_length)
         tmp_crc = tmp_crc ^ poly; // execute the XOR calculation with the poly var
       } // end if
 
-      //DEBUG CODE START
-      Serial.print("Iteration's tmp_crc value: ");
-      Serial.println(tmp_crc, BIN);
-      //DEBUG CODE END
-
       // Regardless if the MSB is a 0 or 1 and the XOR calc was executed, tmp_crc
       //  needs to be prepped for the next FOR iteration if there is one
       //~if (i != 0){ // condition at the data field LSB
-      if (i != 0 && intIndex != (dataSize-1)){ // condition at the data field LSB
+      if (i != 0 || intIndex != (dataSize-1)){ // condition at the data field LSB
         tmp_crc = tmp_crc << 1; // shift left to open up a new bit space
         if (i > crc_length && bitRead(data[intIndex], i-crc_length-1)){
           // if tmp_crc LSB has not passed data's LSB and the next bit in the data
           //  input is a 1
           tmp_crc++; // set the tmp_crc LSB to 1, which is the same as incrementing
         } // end nested if
-        else if (i <= crc_length && bitRead(nextInt, memSize-1-((crc_length-1)-i))){
+        //~else if (i <= crc_length && bitRead(nextInt, memSize-1-((crc_length-1)-i))){
+        if (i <= crc_length && bitRead(nextInt, (memSize-1)-(crc_length-i))){
           // if tmp_crc LSB has passed data[intIndex]'s LSB and the next bit in
           //  data[intIndex+1] is a 1 then
           tmp_crc++; // set the tmp_crc LSB to 1, which is the same as incrementing

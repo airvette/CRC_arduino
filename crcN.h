@@ -2,6 +2,7 @@
  * A simple header file containing the function prototype for calculating the
  * cyclic redundancy check (crc) as a checksum for communication between an
  * Arduino and another device.
+ *
  * To make the most use of the overloaded functionality, the recommended format
  * of the function call is:
  * int crc_output = crcN(data, sizeof(data)/2, crc_length);
@@ -20,17 +21,16 @@
  *   if the number is greater than 16, the length is set to 16, which is suitable
  *   crc length for most applications that can support a two-byte crc
  * One varible is returned:
- * - cksum: Short for checksum.  It assumed that calculating the CRC will be one of
- *   the last actions before transmitting a digital packet.  The user is
- *   responsible for assembling the packet which is made up of the input data,
- *   the crc and any other relevant info.
-
+ * - crc: Short for Cyclic Reduncancy Check, a type of checksum.  It assumed
+ *   that calculating the CRC will be one of the last actions before
+ *   transmitting a digital packet.  The user is responsible for assembling the
+ *   packet which should be made up of the input data, the crc and any other
+ *   relevant info.
+ *
  * Note on memory: There are two different functions below.  The standard
  *   function (crcN) uses the standard memory size of an integer (16 bits),
- *   whereas crcNl utilizes the long format for data types and crc checksums
- *   longer than 16 bits.  This extra capability function can handle a data input
- *   up to 32 bits and a crc as large as 28 bits with the draw back of utilizing
- *   much more memory
+ *   whereas crcN utilizes the an array format for data types
+ *   longer than 16 bits.
  */
 
  #include "Arduino.h"
