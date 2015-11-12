@@ -13,4 +13,6 @@ Where:
 - `sizeof(data)/2` = the number of elements in the array.  The function `sizeof()` returns the number of bytes in the referenced variable.  Dividing this result yields the number of 16-bit integers
 - `crc_length` = the desired length of the crc suffix.  The code will correct for it, but the values need to be between 3 and 15
 
+If you would like to use this code, the only required files are **crcN.cpp** and **crcN.h**.  Everything else was used to support the development and testing of these two files.
+
 This is my first attempt at creating code for the Arduino community, so any feedback is welcome!
